@@ -909,6 +909,12 @@
                   <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                 </svg>
               </button>
+              <button class="bubble-action edit" data-bubble="${b.id}" title="Edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
               <button class="bubble-action delete" data-bubble="${b.id}" title="Delete">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                   <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
@@ -954,6 +960,10 @@
 
       document.querySelectorAll('.bubble-action.delete').forEach(btn => {
         btn.addEventListener('click', () => deleteBubble(diary, btn.dataset.bubble));
+      });
+
+      document.querySelectorAll('.bubble-action.edit').forEach(btn => {
+        btn.addEventListener('click', () => editBubble(diary, btn.dataset.bubble));
       });
     }
 
@@ -1039,6 +1049,60 @@
       renderSidebar();
       renderMain();
       showToast('气泡已删除');
+    }
+
+    function editBubble(diary, bubbleId) {
+      const bubble = diary.bubbles.find(b => b.id === bubbleId);
+      if (!bubble) return;
+
+      const wrapper = document.querySelector(`.bubble-wrapper[data-bubble-id="${CSS.escape(bubbleId)}"]`);
+      if (!wrapper) return;
+
+      const origHtml = wrapper.innerHTML;
+
+      wrapper.innerHTML = `
+        <div class="bubble">
+          <textarea id="bubbleEditor" style="width:100%;font-size:15px;line-height:1.75;font-family:var(--font);color:var(--black);border:1px solid var(--border);border-radius:var(--radius);padding:14px;resize:vertical;outline:none;min-height:100px;background:var(--white);">${escapeHtml(bubble.content)}</textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;justify-content:flex-end;">
+            <button class="btn-cancel" id="bubbleCancel">取消</button>
+            <button class="btn-save" id="bubbleSave">保存</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('bubbleCancel').addEventListener('click', () => {
+        wrapper.innerHTML = origHtml;
+        rebindBubbleActions(diary);
+      });
+
+      document.getElementById('bubbleSave').addEventListener('click', () => {
+        const val = document.getElementById('bubbleEditor').value.trim();
+        if (val) {
+          bubble.content = val;
+          diary.updatedAt = new Date().toISOString();
+          saveDiaries();
+          renderSidebar();
+          renderMain();
+          showToast('气泡已保存');
+        } else {
+          wrapper.innerHTML = origHtml;
+          rebindBubbleActions(diary);
+        }
+      });
+
+      document.getElementById('bubbleEditor').focus();
+    }
+
+    function rebindBubbleActions(diary) {
+      document.querySelectorAll('.bubble-action.copy').forEach(btn => {
+        btn.addEventListener('click', () => copyBubble(diary, btn.dataset.bubble, btn));
+      });
+      document.querySelectorAll('.bubble-action.delete').forEach(btn => {
+        btn.addEventListener('click', () => deleteBubble(diary, btn.dataset.bubble));
+      });
+      document.querySelectorAll('.bubble-action.edit').forEach(btn => {
+        btn.addEventListener('click', () => editBubble(diary, btn.dataset.bubble));
+      });
     }
 
     function autoResize(textarea) {
