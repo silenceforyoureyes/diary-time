@@ -1449,7 +1449,10 @@
     }
 
     // ===== SETTINGS MODAL =====
-    function openSettingsModal() { $settingsModal.classList.add('open'); }
+    function openSettingsModal() {
+      closeSidebar();
+      $settingsModal.classList.add('open');
+    }
     function closeSettingsModal() { $settingsModal.classList.remove('open'); }
 
     // ===== SIDEBAR MOBILE =====
