@@ -289,29 +289,8 @@
     .main-content::-webkit-scrollbar-thumb { background: #D5D3CE; border-radius: 12px; }
 
     .diary-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 20px 0 16px; position: sticky; top: 0;
-      background: var(--gray); z-index: 2;
-      border-bottom: 1px solid var(--border-light); margin-bottom: 24px;
+      display: none;
     }
-
-    .diary-date {
-      font-size: 15px; font-weight: 600; color: var(--text-secondary);
-      display: flex; align-items: center; gap: 8px;
-    }
-
-    .diary-date svg { width: 16px; height: 16px; color: var(--text-tertiary); }
-
-    .btn-edit-diary {
-      padding: 6px 12px; background: transparent;
-      border: 1px solid var(--border); border-radius: var(--radius-sm);
-      font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit;
-      color: var(--text-secondary); display: flex; align-items: center; gap: 6px;
-      transition: all var(--transition);
-    }
-
-    .btn-edit-diary:hover { background: var(--hover); border-color: #D0D0C8; color: var(--black); }
-    .btn-edit-diary svg { width: 13px; height: 13px; }
 
     /* ===== BUBBLES ===== */
     .bubbles {
@@ -610,10 +589,6 @@
       .main-content {
         padding: 0 16px;
         padding-top: calc(12px + var(--safe-top));
-      }
-
-      .diary-header {
-        display: none;
       }
 
       .bubble-wrapper {
