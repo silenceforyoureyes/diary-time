@@ -212,8 +212,10 @@
 
     .diary-item-pin svg { width: 14px; height: 14px; }
 
-    .diary-group-pinned .diary-group-title {
-      color: var(--primary);
+    .diary-group-pinned {
+      padding-bottom: 6px;
+      margin-bottom: 2px;
+      border-bottom: 1px solid var(--border);
     }
 
     .diary-list-empty {
@@ -870,7 +872,7 @@
       let html = '';
 
       if (pinned.length > 0) {
-        html += `<div class="diary-group diary-group-pinned"><div class="diary-group-title">📌 置顶</div>`;
+        html += `<div class="diary-group diary-group-pinned">`;
         for (const d of pinned) {
           html += buildDiaryItemHTML(d);
         }
