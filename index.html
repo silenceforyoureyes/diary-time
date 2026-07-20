@@ -2,16 +2,21 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#FCFAF6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="日记本">
   <meta name="description" content="一个简单优雅的日记应用">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23FCFAF6'/><text y='72' x='50' text-anchor='middle' font-size='52'>📔</text></svg>">
   <link rel="manifest" href="/manifest.json">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
   <title>日记本</title>
   <style>
     :root {
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+      --safe-left: env(safe-area-inset-left);
+      --safe-right: env(safe-area-inset-right);
       --white: #FFFFFF;
       --black: #181411;
       --gray: #FCFAF6;
@@ -38,7 +43,7 @@
       --radius-xl: 24px;
       --sidebar-width: 260px;
       --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
       --font-mono: 'SF Mono', 'Cascadia Code', 'Consolas', 'Menlo', monospace;
     }
 
@@ -583,21 +588,106 @@
 
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ===== RESPONSIVE ===== */
+    /* ===== RESPONSIVE (Mobile < 768px) ===== */
     @media (max-width: 768px) {
+      body { padding: 0; }
+
       .sidebar {
-        position: fixed; left: 0; top: 0; height: 100vh;
+        position: fixed; left: 0; top: 0; height: 100vh; width: 280px; max-width: 85vw;
         transform: translateX(-100%); box-shadow: var(--shadow-md);
+        z-index: 110;
+        padding-top: var(--safe-top);
       }
 
       .sidebar.open { transform: translateX(0); }
-      .hamburger { display: flex; }
+      .hamburger { display: flex; top: calc(12px + var(--safe-top)); }
+      .btn-collapse { display: none; }
 
-      .main-content { padding: 0 12px; }
-      .input-area { padding: 0 12px 20px; }
-      .diary-header { padding: 14px 0 12px 52px; }
+      .main-content {
+        padding: 0 16px;
+        padding-top: calc(12px + var(--safe-top));
+      }
 
-      .modal { width: 94vw; max-height: 70vh; overflow-y: auto; }
+      .diary-header {
+        padding: 14px 0 12px 0;
+      }
+
+      .bubble-wrapper {
+        padding: 0 0 10px;
+      }
+
+      .bubble {
+        border-radius: var(--radius-sm);
+        padding: 14px 16px;
+      }
+
+      .bubble-content {
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+      .input-area {
+        padding: 0 16px calc(16px + var(--safe-bottom));
+      }
+
+      .input-row {
+        flex-direction: column;
+        gap: 8px;
+        border-radius: var(--radius);
+        padding: 8px;
+      }
+
+      .diary-input {
+        min-height: 44px;
+        font-size: 15px;
+      }
+
+      .btn-send {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+      }
+
+      .btn-attach {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+      }
+
+      .modal {
+        width: 100vw;
+        max-width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .modal-header {
+        padding-top: calc(20px + var(--safe-top));
+      }
+
+      .modal-body {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .toast {
+        bottom: calc(24px + var(--safe-bottom));
+      }
+
+      .diary-item {
+        padding: 10px 12px;
+      }
+
+      .btn-new-chat {
+        margin: 4px 12px 8px;
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+
+      .overlay { z-index: 105; }
     }
   </style>
 </head>
