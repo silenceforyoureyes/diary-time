@@ -208,7 +208,6 @@
 
     .diary-item:hover .diary-item-pin { opacity: 0.5; }
     .diary-item-pin:hover { opacity: 1 !important; color: var(--primary); }
-    .diary-item-pin.pinned { opacity: 0.7; color: var(--primary); }
 
     .diary-item-pin svg { width: 14px; height: 14px; }
 
@@ -1083,7 +1082,7 @@
 
     function deleteBubble(diary, bubbleId) {
       if (diary.bubbles.length <= 1) {
-        showToast('至少保留一条气泡');
+        deleteDiary(diary.id);
         return;
       }
       diary.bubbles = diary.bubbles.filter(b => b.id !== bubbleId);
@@ -1381,7 +1380,6 @@
       diary.updatedAt = new Date().toISOString();
       saveDiaries();
       renderSidebar();
-      showToast(diary.pinned ? '已置顶' : '已取消置顶');
     }
 
     $diaryList.addEventListener('click', (e) => {
