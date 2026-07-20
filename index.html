@@ -219,6 +219,47 @@
 
     .diary-item-pin svg { width: 14px; height: 14px; }
 
+    .diary-item-menu {
+      opacity: 0; width: 26px; height: 26px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: none; background: transparent; cursor: pointer;
+      border-radius: 4px; color: var(--text-tertiary);
+      transition: opacity var(--transition), color var(--transition);
+      margin-left: 2px; position: relative;
+    }
+
+    .diary-item:hover .diary-item-menu { opacity: 0.5; }
+    .diary-item-menu:hover { opacity: 1 !important; color: var(--black); }
+    .diary-item-menu svg { width: 16px; height: 16px; }
+    .diary-item-menu.open { opacity: 1; color: var(--black); }
+
+    @media (max-width: 768px) {
+      .diary-item-pin, .diary-item-delete { opacity: 0 !important; pointer-events: none; }
+      .diary-item-menu { opacity: 0.4; }
+      .diary-item-menu.open { opacity: 1; }
+    }
+
+    .diary-context-menu {
+      display: none; position: fixed; z-index: 200;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); box-shadow: var(--shadow-lg);
+      padding: 4px; min-width: 140px; flex-direction: column;
+    }
+
+    .diary-context-menu.show { display: flex; }
+
+    .diary-context-menu button {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border: none; background: transparent;
+      font-size: 14px; font-family: inherit; color: var(--black);
+      cursor: pointer; border-radius: 6px; transition: background var(--transition);
+    }
+
+    .diary-context-menu button:hover { background: var(--hover); }
+    .diary-context-menu button.danger { color: var(--danger); }
+    .diary-context-menu button svg { width: 16px; height: 16px; color: var(--text-tertiary); flex-shrink: 0; }
+    .diary-context-menu button.danger svg { color: var(--danger); }
+
     .diary-group-pinned {
       padding-bottom: 6px;
       margin-bottom: 2px;
@@ -790,6 +831,7 @@
   <input type="file" id="fileInput" accept=".json" style="display:none;">
   <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
   <div class="toast" id="toast"></div>
+  <div class="diary-context-menu" id="contextMenu"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"
           onerror="this.onerror=null;this.src='https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/marked/11.0.0/marked.min.js'"></script>
@@ -979,6 +1021,11 @@
           <button class="diary-item-delete" data-delete="${d.id}" title="删除">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+            </svg>
+          </button>
+          <button class="diary-item-menu" data-menu="${d.id}" aria-label="更多操作">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
             </svg>
           </button>
         </div>`;
@@ -1455,7 +1502,48 @@
       diary.pinned = !diary.pinned;
       diary.updatedAt = new Date().toISOString();
       saveDiaries();
+      closeContextMenu();
       renderSidebar();
+    }
+
+    let contextMenuId = null;
+
+    function showContextMenu(id, x, y) {
+      const diary = getDiary(id);
+      if (!diary) return;
+      contextMenuId = id;
+      const menu = document.getElementById('contextMenu');
+      menu.innerHTML = `
+        <button data-action="pin" data-id="${id}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/>
+          </svg>
+          ${diary.pinned ? '取消置顶' : '置顶'}
+        </button>
+        <button data-action="delete" data-id="${id}" class="danger">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+          </svg>
+          删除
+        </button>
+      `;
+      menu.classList.add('show');
+      const menuRect = menu.getBoundingClientRect();
+      let left = x, top = y;
+      if (left + menuRect.width > window.innerWidth) left = window.innerWidth - menuRect.width - 8;
+      if (top + menuRect.height > window.innerHeight) top = window.innerHeight - menuRect.height - 8;
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+      const menuBtn = document.querySelector(`[data-menu="${id}"]`);
+      if (menuBtn) menuBtn.classList.add('open');
+    }
+
+    function closeContextMenu() {
+      contextMenuId = null;
+      const menu = document.getElementById('contextMenu');
+      menu.classList.remove('show');
+      const menuBtn = document.querySelector('.diary-item-menu.open');
+      if (menuBtn) menuBtn.classList.remove('open');
     }
 
     $diaryList.addEventListener('click', (e) => {
@@ -1471,8 +1559,30 @@
         togglePin(pinBtn.dataset.pin);
         return;
       }
+      const menuBtn = e.target.closest('.diary-item-menu');
+      if (menuBtn) {
+        e.stopPropagation();
+        const rect = menuBtn.getBoundingClientRect();
+        showContextMenu(menuBtn.dataset.menu, rect.left, rect.bottom + 4);
+        return;
+      }
       const item = e.target.closest('.diary-item');
       if (item) selectDiary(item.dataset.id);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (contextMenuId && !e.target.closest('.diary-context-menu') && !e.target.closest('.diary-item-menu')) {
+        closeContextMenu();
+      }
+    });
+
+    document.getElementById('contextMenu').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if (action === 'pin') togglePin(id);
+      if (action === 'delete') { closeContextMenu(); deleteDiary(id); }
     });
 
     $diaryInput.addEventListener('input', () => {
