@@ -30,7 +30,9 @@ vercel --prod
 
 ## 📸 界面
 
-仿 Claude 聊天界面的日记应用：左侧日期分组列表 + 右侧气泡式日记流 + 底部圆角输入框。
+![欢迎页](screenshots/welcome.png)
+
+![气泡日记流](screenshots/bubbles.png)
 
 ## 🎨 设计参考
 
