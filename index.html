@@ -718,7 +718,8 @@
   <input type="file" id="imageInput" accept="image/*" multiple style="display:none;">
   <div class="toast" id="toast"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"
+          onerror="this.onerror=null;this.src='https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/marked/11.0.0/marked.min.js'"></script>
   <script>
     const STORAGE_KEY = 'diary_app_v3_bubbles';
     const DIARY_DATE_OPTS = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
@@ -777,6 +778,10 @@
     }
 
     function getDiary(id) { return diaries.find(d => d.id === id); }
+
+    function renderMarkdown(text) {
+      return (typeof marked !== 'undefined') ? marked.parse(text) : escapeHtml(text);
+    }
 
     function generateId() {
       return Date.now().toString(36) + Math.random().toString(36).substr(2, 8);
@@ -937,7 +942,7 @@
         bubblesHtml = diary.bubbles.map(b => `
           <div class="bubble-wrapper" data-bubble-id="${b.id}">
             <div class="bubble">
-              <div class="bubble-content">${marked.parse(b.content)}</div>
+              <div class="bubble-content">${renderMarkdown(b.content)}</div>
               <div class="bubble-time">${formatTime(b.createdAt)}</div>
             </div>
             <div class="bubble-actions">
@@ -1488,14 +1493,20 @@
 
     // ===== INIT =====
     function init() {
-      loadDiaries();
-      if (diaries.length > 0) currentId = diaries[0].id;
-      renderSidebar();
-      renderMain();
-      if (currentId) $diaryInput.focus();
+      try {
+        loadDiaries();
+        if (diaries.length > 0) currentId = diaries[0].id;
+        renderSidebar();
+        renderMain();
+        if (currentId) $diaryInput.focus();
+      } catch(e) { console.error(e); }
     }
 
-    init();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
   </script>
 </body>
 </html>
