@@ -593,10 +593,11 @@
       body { padding: 0; }
 
       .sidebar {
-        position: fixed; left: 0; top: 0; height: 100vh; width: 280px; max-width: 85vw;
+        position: fixed; left: 0; top: 0; bottom: 0; width: 280px; max-width: 85vw;
         transform: translateX(-100%); box-shadow: var(--shadow-md);
         z-index: 110;
         padding-top: var(--safe-top);
+        padding-bottom: var(--safe-bottom);
       }
 
       .sidebar.open { transform: translateX(0); }
@@ -688,6 +689,16 @@
       }
 
       .overlay { z-index: 105; }
+
+      .sidebar-footer {
+        padding: 12px 16px calc(12px + var(--safe-bottom));
+      }
+
+      .btn-settings {
+        width: 40px; height: 40px;
+      }
+
+      .btn-settings svg { width: 22px; height: 22px; }
     }
   </style>
 </head>
